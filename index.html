@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title> snake </title>
+
+    <script src="index.js" defer></script>
+
+    <script src="https://kit.fontawesome.com/0c12bb8f67.js"></script>
+</head>
+<body style="margin:0; font-family: sans-serif; overscroll-behavior: contain;">
+
+    <div style="position: fixed; top: 10px; left: 10px; aspect-ratio: 1/1; display: flex; align-items: center; font-size: 2em;">
+        <span style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; cursor: pointer;" onclick="document.location.reload()"> f5 </span>
+    </div>
+
+    <div style="position: fixed; top: 10px; right: 10px; aspect-ratio: 2/1; display: flex; align-items: center;">
+        <i class="fa-solid fa-arrows-rotate fa-2xl" onclick="init()" style="cursor: pointer;"></i>
+        <i class="fa-solid fa-paintbrush fa-2xl" onclick="changeColors()" style="cursor: pointer;"></i>
+    </div>
+
+    <div style="width: 100vw; height: 100svh; display: flex; justify-content: center; align-items: center;">
+        <canvas id="cvs" width="300" height="400"></canvas>
+    </div>
+
+</body>
+</html>
