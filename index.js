@@ -1,21 +1,38 @@
+
+const DEBUG = false;
+console.deb = (...args) => { if( DEBUG ) console.log( ...args ); }
+document.addEventListener('keydown', e => { if(e.key===' ') debugger; } )
+
 const cvs = document.querySelector('#cvs'),
-    ctx = cvs.getContext('2d')
+    ctx = cvs.getContext('2d');
 
 ctx.imageSmoothingEnabled = true;
 ctx.imageSmoothingQuality = 'high';
+
+
+const autoPlay = true;
+
 
 const box = {
     size: 0,
     cnt: {
         border: [2, 1, 1, 1],
-        inner: [12, 13],
-        x: 1 + 1 + 12,
-        y: 2 + 1 + 13,
+        inner: [20, 20],
+        x: 1 + 1 + 20,
+        y: 2 + 1 + 20,
     },
 }
 const text = {
-    font: `48px sans-serif `,
-    pos: [0,0],
+    score: {
+        fz: 48,
+        ff: `sans-serif `,
+        pos: [0,0],
+    },
+    maxScore: {
+        fz: 24,
+        ff: `sans-serif `,
+        pos: [0,0], // symbols: 5 + 2
+    }
 }
 const food = {
     cnt: 3,
@@ -35,7 +52,8 @@ let snake = {
     body: [],
     gap: 0.03   // percent of box size
 },
-score = 0
+score = 0,
+maxScore = score
 
 
 
@@ -56,6 +74,7 @@ const initFood = (x, y) => {
 
 let interval = null
 const initGame = (e)=> {
+    clearInterval(interval)
     interval = setInterval( main, 130 )
     document.removeEventListener('keydown', initGame)
     document.removeEventListener('touchmove', initGame)
@@ -90,6 +109,10 @@ const init = () => {
 
     drawStatic()
 
+    if(autoPlay){
+        findWay()
+    }
+
     document.addEventListener('keydown', initGame)
     document.addEventListener('touchmove', initGame)
 }
@@ -99,15 +122,18 @@ document.addEventListener( 'keydown', (e)=>{
     if(e.key === 'c') changeColors()        // update color set
 } )
 const updateSizes = (e)=>{
-    (window.innerWidth>window.innerHeight) ?
-        box.size = window.innerHeight / box.cnt.y :
-        box.size = window.innerWidth / box.cnt.x
+    (window.innerWidth > window.innerHeight) 
+        ? box.size = window.innerHeight / box.cnt.y 
+        : box.size = window.innerWidth / box.cnt.x
 
     cvs.width = box.size * box.cnt.x
     cvs.height = box.size * box.cnt.y
 
-    text.pos[0] = box.size*1.5
-    text.pos[1] = 48 + (box.size*box.cnt.border[0]-48)/2
+    text.score.pos[0] = box.size*1.5
+    text.score.pos[1] = text.score.fz + (box.size*box.cnt.border[0]- text.score.fz )/2
+
+    text.maxScore.pos[0] = cvs.width - box.size - text.maxScore.fz * 5
+    text.maxScore.pos[1] = text.maxScore.fz + (box.size*box.cnt.border[0]-text.maxScore.fz )/2
 
     init()
 }
@@ -140,9 +166,13 @@ const drawField = () => {
 }
 
 const drawScore = (n) => {
-    ctx.font = text.font;
+
+    ctx.font = `${text.score.fz}px ${text.score.ff}`;
     ctx.fillStyle = colors.text
-    ctx.fillText(`Score: ${n}`, text.pos[0], text.pos[1]);
+    ctx.fillText(`Score: ${n}`, text.score.pos[0], text.score.pos[1]);
+
+    ctx.font = `${text.maxScore.fz}px ${text.maxScore.ff}`;
+    ctx.fillText( `max: ${maxScore}`, text.maxScore.pos[0], text.maxScore.pos[1] )
 }
 
 const drawSnake = () => {
@@ -177,16 +207,16 @@ const drawStatic = () => {
 
 const colorSets = [
     {
-        border: '#578a34',
-        field: ['#aad751', '#a2d149'],
-        text: '#fff',
-        snake: ['#1c469d', '#4876ec', '#4876ec'],
-    },
-    {
         border: '#006000',
         field: ['#0fff00', '#00f000'],
         text: '#fff',
         snake: ['red', 'yellow', 'blue'],
+    },
+    {
+        border: '#578a34',
+        field: ['#aad751', '#a2d149'],
+        text: '#fff',
+        snake: ['#1c469d', '#4876ec', '#4876ec'],
     }
 ]
 let colors = {}
@@ -256,13 +286,13 @@ document.addEventListener('touchmove', e=>{
     }
 }, {passive: true})
 
-const moveSnake = () => {
+const moveSnake = (currentDir) => {
     const newHead = {
         pos: [snake.body[0].pos[0], snake.body[0].pos[1]],
-        dir: dir,
+        dir: currentDir,
         type: 0,
     }
-    switch (dir) {
+    switch (currentDir) {
         case 0:                 // y-
             newHead.pos[1]--
             break
@@ -298,14 +328,19 @@ const moveSnake = () => {
 
 
 const collision = (head) => {
-    if( head.pos[0] < 0 || head.pos[0] === box.cnt.inner[0] )                   // checking border collision
+    if( head.pos[0] < 0 || head.pos[0] === box.cnt.inner[0] ){                   // checking border collision
         return true
-    if( head.pos[1] < 0 || head.pos[1] === box.cnt.inner[1] )
+    }
+    if( head.pos[1] < 0 || head.pos[1] === box.cnt.inner[1] ){
         return true
+    }
+        
 
-    for (el of snake.body)                                                      // checking snakes body collision
-        if( el.type && el.pos[0]===head.pos[0] && head.pos[1]===el.pos[1] )     // snakes head type in body is 0
+    for (el of snake.body){                                                     // checking snakes body collision
+        if( el.type && el.pos[0]===head.pos[0] && head.pos[1]===el.pos[1] ){    // snakes head type in body is 0
             return true                                                         //        what is equal to false
+        }
+    }
     
     return false
 }
@@ -314,7 +349,13 @@ const eat = (head) => {
         const el = food.array[i]
         if( el[0]===head.pos[0] && head.pos[1]===el[1] ){
             score++
+            maxScore = Math.max( score, maxScore )
             food.array[i] = initFood(box.cnt.inner[0], box.cnt.inner[1])        // update eaten element position
+
+            if(autoPlay) {
+                findWay();
+            }
+
             return true
         }
     }
@@ -322,11 +363,175 @@ const eat = (head) => {
 }
 
 
+//
+let dirStack = []
+let wanted = {
+    way: box.cnt.inner[0]+box.cnt.inner[1],
+    pos: [],
+}
+const findWay = () => {
+    let DROP_CNT = 0; const DROP_MAX = 1e3 //(box.cnt.inner[0]+box.cnt.inner[1])*7
+
+    let head = [...snake.body[0].pos]
+
+    dirStack = []
+
+    let tempSnake = JSON.parse(JSON.stringify(snake));
+
+    console.deb('head start', head)
+
+    const checkX = () => {
+        return food.array
+                .some( foodEl => ( head[0] === foodEl[0] &&
+                    // !tempSnake.body
+                    !snake.body
+                        .filter( snakeEl => ( snakeEl.type && snakeEl.pos[0] === foodEl[0] ) )
+                        .some( snakeEl =>
+                            (( head[1] > snakeEl.pos[1] && head[1] > foodEl[1] && snakeEl.pos[1] > foodEl[1] ) || 
+                            ( head[1] < snakeEl.pos[1] && head[1] < foodEl[1] && snakeEl.pos[1] < foodEl[1] ))
+                        )
+                )
+        )
+    }
+    const checkY = () => {
+        return food.array
+                .some( foodEl => ( head[1] === foodEl[1] &&
+                    // !tempSnake.body
+                    !snake.body
+                        .filter( snakeEl => ( snakeEl.type && snakeEl.pos[1] === foodEl[1] ) )
+                        .some( snakeEl =>
+                            (( head[0] > snakeEl.pos[0] && head[0] > foodEl[0] && snakeEl.pos[0] > foodEl[0] ) || 
+                            ( head[0] < snakeEl.pos[0] && head[0] < foodEl[0] && snakeEl.pos[0] < foodEl[0] ))
+                        )
+                )
+        )
+    }
+
+    let searchXAxis = true
+    while( 1 ){
+        if( checkX() ){
+            searchXAxis = true
+            break
+        } else if( checkY() ){
+            searchXAxis = false
+            break
+        }
+
+        DROP_CNT++; if(DROP_CNT >= DROP_MAX){ if(DEBUG) { console.deb('dirs:', dirStack); debugger; } else { init(); initGame(); console.warn("ne zaciklivaisya na odnom") } }
+
+        // console.deb('currentDirs:', dirStack )
+
+        switch( dir ) {
+            case 0:
+                head[1]--
+                break
+            case 1:
+                head[0]++
+                break
+            case 2:
+                head[1]++
+                break
+            case 3:
+                head[0]--
+                break
+        }
+        
+        const hitBody = /*tempSnake*/snake.body.some( snakeEl => (snakeEl.pos[0]===head[0] && snakeEl.pos[1]===head[1]) )
+
+        if( head[0] >= box.cnt.inner[0] || head[0] < 0) {
+            dir = Number(Math.max( head[1], box.cnt.inner[1]-head[1]-1) !== head[1])*2
+            head[0] = (head[0] < 0 ? 0 : box.cnt.inner[0]-1)
+            console.deb("turn from X", dir, dirStack)
+            continue
+        } else if ( head[1] >= box.cnt.inner[1] || head[1] < 0) {
+            dir = Number(Math.max( head[0], box.cnt.inner[0]-head[0]-1) === head[0])*2 + 1
+            head[1] = (head[1] < 0 ? 0 : box.cnt.inner[1]-1)
+            console.deb("turn from Y", dir, dirStack)
+            continue
+        } else if(hitBody){
+            switch (dir) {
+                case 0 || 2:
+                    dir = Number(Math.max( head[0], box.cnt.inner[0]-head[0]-1) === head[0])*2 + 1
+                    head[1] += dir ? 1 : -1
+                    break
+                case 1 || 3:
+                    dir = Number(Math.max( head[1], box.cnt.inner[1]-head[1]-1) !== head[1])*2
+                    head[0] += dir===3 ? 1 : -1
+                    break
+            }
+            continue
+        }
+
+        // tempSnake.body.unshift({pos: head, type: 0});
+        // tempSnake.body[1].type = 1; tempSnake.body[tempSnake.body.length-1].type = 2;
+
+        dirStack.push(dir)
+    }
+    
+    if(searchXAxis)
+        wanted.pos = food.array.sort(el=>el[1]-head[1]).find( el => el[0]===head[0] )
+    else
+        wanted.pos = food.array.sort(el=>el[0]-head[0]).find( el => el[1]===head[1] )
+
+    console.deb('head:', head)
+    console.deb('wanted:', wanted.pos)
+    console.deb('dirs:', dirStack)
+
+
+    if( head[0] === wanted.pos[0] ){
+        while( head[1] !== wanted.pos[1] ){
+            const temp = (head[1] < wanted.pos[1])*2
+            temp===2
+                ? head[1]++
+                : head[1]--
+            // moveSnake(temp);
+            dirStack.push(temp);
+        }
+    } else if( head[1] === wanted.pos[1] ) {
+        while( head[0] !== wanted.pos[0] ){
+            const temp = (head[0] > wanted.pos[0])*2+1
+            temp===1
+                ? head[0]++
+                : head[0]--
+            // moveSnake(temp);
+            dirStack.push(temp)
+        }
+    }
+
+    
+    console.deb("-----------");
+    // snake = oldSnake
+}
+//
+
 
 const main = () => {
     document.removeEventListener('keydown', handleKey)
     document.addEventListener('keydown', handleKey)
 
-    if( moveSnake() )
-        drawStatic()
+    if( autoPlay ){
+        dir = dirStack.shift()
+        if(typeof(dir) == 'number')
+            if( moveSnake(dir) )
+                drawStatic()
+            else {
+                console.deb('dirs:', dirStack)
+                console.warn( "cant move snake" )
+                if( !DEBUG ) {
+                    init()
+                    initGame()
+                }
+            }
+        else  {
+            console.warn( typeof dir )
+            if( !DEBUG ){
+                init()
+                initGame()
+            }
+        }
+                
+    } else {
+        if( moveSnake( dir ) )
+            drawStatic()
+    }
 }
