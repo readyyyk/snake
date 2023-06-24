@@ -84,4 +84,4 @@ class Snake {
     }
 }
 
-const snake = new Snake(SNAKE_INIT_SIZE, SNAKE_ELEMENTS_GAP)
+const snake = new Snake(SNAKE_INIT_LENGTH, SNAKE_ELEMENTS_GAP)

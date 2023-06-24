@@ -15,7 +15,7 @@ document.addEventListener('keydown', (event) => {
         DIRECTION = 'left';
 
     if(!IS_GAME_STARTED && DIRECTION!=='')
-        GAME_LOOP = gameLoop()
+        GAME_LOOP = startGameLoop()
 });
 
 const main = () => {
@@ -28,15 +28,18 @@ const main = () => {
     }
 
     const eatedFood = snake.checkEatCollision(foodStack)
-    if(eatedFood !== undefined)
+    if(eatedFood !== undefined){
         eatedFood.updatePosition([...snake.body, ...foodStack])
+        score.increment()
+    }
 
     drawFieldAndBorders()
     snake.draw()
     foodStack.forEach((food) => food.draw())
+    score.draw()
 }
 
-const gameLoop = () => setInterval(() => {
+const startGameLoop = () => setInterval(() => {
     IS_GAME_STARTED = true;
     main()
 }, 170);
@@ -44,7 +47,7 @@ const gameLoop = () => setInterval(() => {
 // initial actions
 drawFieldAndBorders()
 snake.draw()
-
+score.draw()
 FOOD_IMAGE.onload = () => {
     for (let i=0; i<FOOD_CNT; i++){
         const food = new Food([...snake.body, ...foodStack]);
