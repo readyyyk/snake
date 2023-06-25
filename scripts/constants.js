@@ -21,3 +21,7 @@ FIELD_SIZE.full = {
 
 cvs.width  = TILE * FIELD_SIZE.full.w;
 cvs.height = TILE * FIELD_SIZE.full.h;
+
+
+const SNAKE_INIT_LENGTH = 3;
+const SNAKE_ELEMENTS_GAP = 0.04;
