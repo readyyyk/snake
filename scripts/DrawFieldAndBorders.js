@@ -1,8 +1,8 @@
 function drawFieldAndBorders(){
-    // draw the field
+    // fill field with checkerboard pattern background
     for (let i = 0; i < FIELD_SIZE.full.w; i++) {
         for (let j=0; j<FIELD_SIZE.full.h; j++) {
-            ctx.fillStyle = (i%2===j%2 ? COLORS.field[0] : COLORS.field[1])
+            ctx.fillStyle = i%2===j%2 ? COLORS.field[0] : COLORS.field[1]
             ctx.fillRect(i * TILE, j * TILE, TILE, TILE)
         }
     }

@@ -5,7 +5,7 @@ const COLORS = {
     border: '#578a34',
     field:  ['#aad751', '#a2d149'],
     text:   '#fff',
-    snake:  ['#1c469d', '#4876ec', '#4876ec'],
+    snake:  ['#1c469d', '#4876ec'],
 };
 
 const TILE = 55;
@@ -19,18 +19,5 @@ FIELD_SIZE.full = {
     h: FIELD_SIZE.h + BORDERS[0] + BORDERS[1]
 };
 
-cvs.width  = TILE*FIELD_SIZE.full.w;
-cvs.height = TILE*FIELD_SIZE.full.h;
-
-const FOOD_IMAGE = new Image();
-FOOD_IMAGE.src   = "./assets/food.png";
-
-const FOOD_CNT = 3;
-
-
-const SNAKE_INIT_LENGTH = 3;
-const SNAKE_ELEMENTS_GAP = 0.04;
-
-const SCORE_FONT_COLOR  = '#000000';
-const SCORE_FONT_SIZE   = TILE;
-const SCORE_FONT_FAMILY = 'sans-serif';
+cvs.width  = TILE * FIELD_SIZE.full.w;
+cvs.height = TILE * FIELD_SIZE.full.h;
