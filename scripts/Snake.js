@@ -1,6 +1,7 @@
 class Snake {
-    body = []
-    gap
+    body = [];
+    gap;
+    isFed = false;
     
     constructor(initSize=3, gap=0.04){ 
         this.gap = gap;
@@ -12,7 +13,10 @@ class Snake {
     }
 
     move(direction){
-        this.body.pop();
+        if(!this.isFed)
+            this.body.pop();
+
+        this.isFed = false;
 
         // copy object
         let newElement = {...this.body[0]};
@@ -48,6 +52,17 @@ class Snake {
             }, false)
 
         return isXBeyondBorders || isYBeyondBorders || isCollisionWithTail
+    }
+    
+    checkEatCollision(food){
+        for(let element of food){
+            if(element.x === this.body[0].x && element.y === this.body[0].y){
+                this.isFed = true
+                return element
+            }
+        }
+
+        return undefined
     }
 
     draw(){
