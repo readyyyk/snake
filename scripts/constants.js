@@ -37,3 +37,9 @@ const FOOD_IMAGE = new Image();
 FOOD_IMAGE.src   = "./assets/food.png";
 
 const FOOD_CNT = 3;
+
+
+// constants for score text
+const SCORE_FONT_COLOR  = '#000000';
+const SCORE_FONT_SIZE   = TILE;
+const SCORE_FONT_FAMILY = 'sans-serif';

@@ -41,16 +41,19 @@ const main = () => {
     const eatedFood = snake.checkEatCollision(foodStack)
     if(eatedFood !== undefined){
         eatedFood.updatePosition([...snake.body, ...foodStack])
+        score.increment()
     }
 
     drawFieldAndBorders()
     snake.draw()
     foodStack.forEach((food) => food.draw())
+    score.draw()
 }
 
 // initial actions
 drawFieldAndBorders()
 snake.draw()
+score.draw()
 FOOD_IMAGE.onload = () => {
     for (let i=0; i<FOOD_CNT; i++){
         const food = new Food([...snake.body, ...foodStack]);
