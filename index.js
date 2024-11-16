@@ -1,5 +1,9 @@
+console.info("## to enable debug use .../?debug\n## to enable debug use .../?auto");
+const urlParams = new URLSearchParams(window.location.search);
+const debugParam = urlParams.has('debug');
+const autoPlayParam = urlParams.has('auto');
 
-const DEBUG = false;
+const DEBUG = debugParam;
 console.deb = (...args) => { if( DEBUG ) console.log( ...args ); }
 document.addEventListener('keydown', e => { if(e.key===' ') debugger; } )
 
@@ -9,9 +13,7 @@ const cvs = document.querySelector('#cvs'),
 ctx.imageSmoothingEnabled = true;
 ctx.imageSmoothingQuality = 'high';
 
-
-const autoPlay = true;
-
+const autoPlay = autoPlayParam ;
 
 const box = {
     size: 0,
